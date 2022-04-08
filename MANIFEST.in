@@ -1,2 +1,5 @@
 include *.md
 include requirements.txt
+global-include *.py
+global-include *.pyi
+global-include *.typed

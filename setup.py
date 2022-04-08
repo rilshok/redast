@@ -3,11 +3,11 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-name = ""
-short_descriprion = ""
+name = "redast"
+short_descriprion = "remote data storage"
 author = "Vladislav A. Proskurov"
 author_email = "rilshok@pm.me"
-url = ""
+url = "https://github.com/rilshok/redast"
 
 version_path = Path(__file__).resolve().parent / name / "__version__.py"
 version = runpy.run_path(version_path)["__version__"]
@@ -30,10 +30,10 @@ setup(
     version=version,
     install_requires=requirements,
     classifiers=[
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 1 - Planning",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.9",
 )
