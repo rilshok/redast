@@ -3,7 +3,6 @@ __all__ = (
     "Compression",
     "Pickling",
     "Encryption",
-    "Encoding",
     "Base64",
     "Conveyor",
 )
@@ -23,11 +22,11 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 class Packaging(ABC):
     @abstractmethod
-    def forward(self, i):
+    def forward(self, i: bytes) -> bytes:
         pass
 
     @abstractmethod
-    def backward(self, o):
+    def backward(self, o: bytes) -> bytes:
         pass
 
 
@@ -111,17 +110,6 @@ class Encryption(Packaging):
         decryptor = Encryption._cipher(self._key).decryptor()
         padded = decryptor.update(o) + decryptor.finalize()
         return unpadder.update(padded) + unpadder.finalize()
-
-
-class Encoding(Packaging):
-    def __init__(self, encoding="utf-8"):
-        self._encoding = encoding
-
-    def forward(self, i):
-        return str(i, self._encoding)
-
-    def backward(self, o):
-        return o.encode(self._encoding)
 
 
 class Base64(Packaging):
