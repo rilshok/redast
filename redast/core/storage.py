@@ -1,13 +1,11 @@
-__all__ = ("Storage", "Link", "LocalStorage", "MemoryStorage")
+__all__ = ("Storage",)
 
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Dict, Union
+from typing import Union
 
 import cloudpickle  # type: ignore
 
-from .bytes import Bytes
-from .hash import Blake2b
+from .hash import blake2b
 from .packaging import *
 
 
@@ -54,7 +52,7 @@ class Storage(ABC):
         encryption_seed: int = None,
     ):
         if hashing == "blake2b":
-            self._alg = Blake2b
+            self._alg = blake2b
         else:
             raise ValueError
         self._default = dict(
@@ -68,8 +66,8 @@ class Storage(ABC):
             ),
         )
 
-    def hash(self, data) -> str:
-        return str(self._alg(Bytes(data)))
+    def hash(self, data: bytes) -> str:
+        return self._alg(data)
 
     @abstractmethod
     def save(self, key: str, data: bytes):
@@ -88,10 +86,10 @@ class Storage(ABC):
         pass
 
     def push(self, data) -> str:
-        hash = self.hash(data)
-        if not self.exists(hash):
-            self.save(hash, data)
-        return hash
+        key = self.hash(data)
+        if not self.exists(key):
+            self.save(key, data)
+        return key
 
     def pull(self, key: str):
         if self.exists(key):
@@ -175,47 +173,3 @@ class Link:
     def pop(self):
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.pop(data_key)
-
-
-class LocalStorage(Storage):
-    def __init__(self, root: Union[Path, str], create: bool = False, **kwargs):
-        root = Path(root)
-        if create:
-            root.mkdir(mode=0o750, parents=False, exist_ok=True)
-        assert root.exists() and root.is_dir()
-        self._root = root
-        super().__init__(**kwargs)
-
-    def exists(self, key: str) -> bool:
-        return (self._root / key).exists()
-
-    def save(self, key: str, data: bytes) -> None:
-        # TODO: split hash by dir parts
-        with open(self._root / key, "wb") as file:
-            file.write(data)
-
-    def load(self, key: str) -> bytes:
-        with open(self._root / key, "rb") as file:
-            data = file.read()
-        return data
-
-    def delete(self, key: str):
-        return NotImplemented
-
-
-class MemoryStorage(Storage):
-    def __init__(self, **kwargs):
-        self._memory: Dict[str, bytes] = dict()
-        super().__init__(**kwargs)
-
-    def exists(self, key: str) -> bool:
-        return key in self._memory
-
-    def load(self, key: str) -> bytes:
-        return self._memory[key]
-
-    def save(self, key: str, data: bytes):
-        self._memory[key] = data
-
-    def delete(self, key: str):
-        del self._memory[key]
