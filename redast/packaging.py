@@ -1,10 +1,10 @@
 __all__ = (
     "Packaging",
+    "Conveyor",
     "Compression",
     "Pickling",
-    "Encryption",
     "Base64",
-    "Conveyor",
+    "Encryption",
 )
 
 import base64
@@ -30,23 +30,48 @@ class Packaging(ABC):
         pass
 
 
+class Conveyor(Packaging):
+    def __init__(self, *packer: Packaging):
+        if not all([isinstance(p, Packaging) for p in packer]):
+            raise ValueError
+        self._packers = packer
+
+    def forward(self, i: bytes) -> bytes:
+        for p in self._packers:
+            i = p.forward(i)
+        return i
+
+    def backward(self, o: bytes) -> bytes:
+        for p in reversed(self._packers):
+            o = p.backward(o)
+        return o
+
+
 class Compression(Packaging):
     def __init__(self, level=-1):
         self._level = level
 
-    def forward(self, i):
+    def forward(self, i: bytes) -> bytes:
         return zlib.compress(i, level=self._level)
 
-    def backward(self, o):
+    def backward(self, o: bytes) -> bytes:
         return zlib.decompress(o)
 
 
 class Pickling(Packaging):
-    def forward(self, i):
+    def forward(self, i: bytes) -> bytes:
         return cloudpickle.dumps(i)
 
-    def backward(self, o):
+    def backward(self, o: bytes) -> bytes:
         return pickle.loads(o)
+
+
+class Base64(Packaging):
+    def forward(self, i: bytes) -> bytes:
+        return base64.urlsafe_b64encode(i)
+
+    def backward(self, o: bytes) -> bytes:
+        return base64.urlsafe_b64decode(o)
 
 
 class Encryption(Packaging):
@@ -99,39 +124,14 @@ class Encryption(Packaging):
             password = Encryption._hash(password)
         return str(base64.urlsafe_b64encode(password), "utf-8")
 
-    def forward(self, i):
+    def forward(self, i: bytes) -> bytes:
         padder = Encryption._padding().padder()
         encryptor = Encryption._cipher(self._key).encryptor()
         padded = padder.update(i) + padder.finalize()
         return encryptor.update(padded) + encryptor.finalize()
 
-    def backward(self, o):
+    def backward(self, o: bytes) -> bytes:
         unpadder = Encryption._padding().unpadder()
         decryptor = Encryption._cipher(self._key).decryptor()
         padded = decryptor.update(o) + decryptor.finalize()
         return unpadder.update(padded) + unpadder.finalize()
-
-
-class Base64(Packaging):
-    def forward(self, i):
-        return base64.urlsafe_b64encode(i)
-
-    def backward(self, o):
-        return base64.urlsafe_b64decode(o)
-
-
-class Conveyor(Packaging):
-    def __init__(self, *packer: Packaging):
-        if not all([isinstance(p, Packaging) for p in packer]):
-            raise ValueError
-        self._packers = packer
-
-    def forward(self, i):
-        for p in self._packers:
-            i = p.forward(i)
-        return i
-
-    def backward(self, o):
-        for p in reversed(self._packers):
-            o = p.backward(o)
-        return o
