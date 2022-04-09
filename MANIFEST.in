@@ -1,5 +1,6 @@
 include *.md
 include requirements.txt
-global-include *.py
-global-include *.pyi
-global-include *.typed
+include LICENSE
+recursive-include redast *.py
+recursive-include redast *.pyi
+recursive-include redast *.typed
