@@ -1,24 +1,80 @@
 __all__ = ("Storage", "Link", "LocalStorage", "MemoryStorage")
 
-import pickle
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict, Union
+
+import cloudpickle  # type: ignore
 
 from .bytes import Bytes
 from .hash import Blake2b
+from .packaging import *
 from .typing import PathLike
 
 
 class InvalidHash(ValueError):
     pass
 
+
+class StorageMethod:
+    def __init__(self, packaging):
+        if not issubclass(packaging, Packaging):
+            raise ValueError("subclass `Packaging` expected")
+        self._type = packaging
+
+    def __get__(self, instance: "Storage", owner):
+        if not issubclass(owner, Storage):
+            raise ValueError
+        if self.key in instance._default:
+            default = instance._default[self.key]
+        else:
+            default = dict()
+        value = self._type(**default)
+        return Pipe(instance, value)
+
+    def __set__(self, instance, value):
+        raise AttributeError
+
+    def __set_name__(self, owner, name):
+        self.key = name
+
+
 class Storage(ABC):
-    def __init__(self, algorithm: str = "blake2b"):
-        if algorithm == "blake2b":
+    compression = StorageMethod(Compression)
+    pickling = StorageMethod(Pickling)
+    encryption = StorageMethod(Encryption)
+    base64 = StorageMethod(Base64)
+
+    def __init__(
+        self,
+        *,
+        hashing: str = "blake2b",
+        compression: int = -1,
+        encryption_key: Union[str, bytes] = None,
+        encryption_password: Union[str, bytes] = None,
+        encryption_seed: int = None,
+    ):
+        if hashing == "blake2b":
             self._alg = Blake2b
         else:
-            raise NotImplementedError
+            raise ValueError
+        self._default = dict(
+            compression=dict(level=compression),
+            encryption=dict(
+                key=encryption_key
+                or Encryption.generate_key(
+                    password=encryption_password,
+                    seed=encryption_seed,
+                )
+            ),
+        )
+
+    def hash(self, data) -> str:
+        return str(self._alg(Bytes(data)))
+
+    @abstractmethod
+    def save(self, key: str, data: bytes):
+        pass
 
     @abstractmethod
     def exists(self, key: str) -> bool:
@@ -29,116 +85,128 @@ class Storage(ABC):
         pass
 
     @abstractmethod
-    def save(self, key: str, data: bytes):
+    def delete(self, key: str):
         pass
 
-    def hash(self, data: bytes) -> str:
-        return str(self._alg(Bytes(data)))
-
-    def push(self, data: bytes) -> str:
-        assert isinstance(data, bytes)
+    def push(self, data) -> str:
         hash = self.hash(data)
         if not self.exists(hash):
             self.save(hash, data)
         return hash
 
-    def pull(self, hash: str) -> bytes:
-        if self.exists(hash):
-            return self.load(hash)
+    def pull(self, key: str):
+        if self.exists(key):
+            return self.load(key)
         raise InvalidHash
 
-    def push_object(self, obj) -> str:
-        dump = pickle.dumps(obj)
-        return self.push(dump)
-
-    def pull_object(self, hash: str) -> Any:
-        dump = self.pull(hash)
-        obj = pickle.loads(dump)
-        return obj
+    def pop(self, key: str):
+        data = self.pull(key)
+        self.delete(key)
+        return data
 
     def link(self, *markers) -> "Link":
         return Link(*markers, storage=self)
 
 
-class Link:
-    def __init__(self, *markers, storage: Storage) -> None:
-        assert isinstance(storage, Storage)
+class Pipe(Storage):
+    def __init__(self, storage, wrapper: Packaging):
+        if not isinstance(storage, Storage):
+            raise ValueError
+        if not isinstance(wrapper, Packaging):
+            raise ValueError
+        self._wrapper = wrapper
+        self._default = storage._default
         self._storage = storage
 
-        def get_bytes(value) -> bytes:
-            if isinstance(value, bytes):
-                return value
-            if isinstance(value, Bytes):
-                return value.__class__.__name__.encode() + bytes(value)
-            if "__bytes__" in dir(value):
-                return bytes(value)
-            return pickle.dumps(value)
+    def __call__(self, **kwargs):
+        self._wrapper = type(self._wrapper)(**kwargs)
+        return self
 
-        marker_bytes = b"|".join(map(get_bytes, markers))
-        self._marker = self.storage.hash(marker_bytes)
+    def save(self, key, data):
+        wrapped = self._wrapper.forward(data)
+        return self._storage.save(key=key, data=wrapped)
 
-    @property
-    def storage(self) -> Storage:
-        return self._storage
+    def exists(self, key: str) -> bool:
+        return self._storage.exists(key=key)
 
-    @property
-    def marker(self) -> str:
-        return self._marker
+    def load(self, key: str):
+        wrapped = self._storage.load(key=key)
+        return self._wrapper.backward(wrapped)
+
+    def delete(self, key: str):
+        return self._storage.delete(key=key)
+
+    def hash(self, data) -> str:
+        wrapped = self._wrapper.forward(data)
+        return self._storage.hash(wrapped)
+
+    def push(self, data) -> str:
+        wrapped = self._wrapper.forward(data)
+        return self._storage.push(wrapped)
+
+    def pull(self, key: str):
+        wrapped = self._storage.pull(key)
+        return self._wrapper.backward(wrapped)
+
+    def pop(self, key: str):
+        wrapped = self._storage.pop(key)
+        return self._wrapper.backward(wrapped)
+
+class Link:
+    def __init__(self, *markers, storage: Storage) -> None:
+        if not isinstance(storage, Storage):
+            raise ValueError
+        self._marker = storage.hash(cloudpickle.dumps(markers))
+        self._storage = storage
+
+    # TODO: garbage collection
 
     def exists(self) -> bool:
-        return self.storage.exists(self.marker)
+        return self._storage.exists(self._marker)
 
-    def push(self, obj: bytes) -> None:
-        obj_hash = self.storage.push(obj).encode()
-        self.storage.save(self.marker, obj_hash)
+    def push(self, data: bytes) -> None:
+        data_key = self._storage.push(data).encode()
+        self._storage.save(self._marker, data_key)
 
     def pull(self):
-        obj_hash = self.storage.pull(self.marker).decode()
-        return self.storage.pull(obj_hash)
+        data_key = self._storage.pull(self._marker).decode()
+        return self._storage.pull(data_key)
 
-    def push_object(self, obj: Any) -> None:
-        obj_hash = self.storage.push_object(obj).encode()
-        self.storage.save(self.marker, obj_hash)
-
-    def pull_object(self) -> Any:
-        obj_hash = self.storage.pull(self.marker).decode()
-        return self.storage.pull_object(obj_hash)
+    def pop(self):
+        data_key = self._storage.pop(self._marker).decode()
+        return self._storage.pop(data_key)
 
 
 class LocalStorage(Storage):
-    def __init__(
-        self, root: PathLike, create: bool = False, algorithm: str = "blake2b"
-    ):
+    def __init__(self, root: PathLike, create: bool = False, **kwargs):
         root = Path(root)
         if create:
             root.mkdir(mode=0o750, parents=False, exist_ok=True)
         assert root.exists() and root.is_dir()
         self._root = root
+        super().__init__(**kwargs)
 
-        super().__init__(algorithm=algorithm)
+    def exists(self, key: str) -> bool:
+        return (self._root / key).exists()
 
-    @property
-    def root(self) -> Path:
-        return self._root
-
-    def exists(self, hash: str) -> bool:
-        return (self.root / hash).exists()
-
-    def save(self, hash: str, data: bytes) -> None:
+    def save(self, key: str, data: bytes) -> None:
         # TODO: split hash by dir parts
-        with open(self.root / hash, "wb") as file:
+        with open(self._root / key, "wb") as file:
             file.write(data)
 
-    def load(self, hash: str) -> bytes:
-        with open(self.root / hash, "rb") as file:
+    def load(self, key: str) -> bytes:
+        with open(self._root / key, "rb") as file:
             data = file.read()
         return data
 
+    def delete(self, key: str):
+        return NotImplemented
+
 
 class MemoryStorage(Storage):
-    def __init__(self, algorithm: str = "blake2b"):
+    def __init__(self, **kwargs):
         self._memory: Dict[str, bytes] = dict()
-        super().__init__(algorithm=algorithm)
+        super().__init__(**kwargs)
 
     def exists(self, key: str) -> bool:
         return key in self._memory
@@ -148,3 +216,6 @@ class MemoryStorage(Storage):
 
     def save(self, key: str, data: bytes):
         self._memory[key] = data
+
+    def delete(self, key: str):
+        del self._memory[key]
