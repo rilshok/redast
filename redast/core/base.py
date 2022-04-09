@@ -9,7 +9,6 @@ import cloudpickle  # type: ignore
 from .bytes import Bytes
 from .hash import Blake2b
 from .packaging import *
-from .typing import PathLike
 
 
 class InvalidHash(ValueError):
@@ -152,6 +151,7 @@ class Pipe(Storage):
         wrapped = self._storage.pop(key)
         return self._wrapper.backward(wrapped)
 
+
 class Link:
     def __init__(self, *markers, storage: Storage) -> None:
         if not isinstance(storage, Storage):
@@ -178,7 +178,7 @@ class Link:
 
 
 class LocalStorage(Storage):
-    def __init__(self, root: PathLike, create: bool = False, **kwargs):
+    def __init__(self, root: Union[Path, str], create: bool = False, **kwargs):
         root = Path(root)
         if create:
             root.mkdir(mode=0o750, parents=False, exist_ok=True)
