@@ -249,7 +249,6 @@ print(encrypted, decrypted, sep="\n")
 ```plain
 b'\xe4\xc6\x0bc\xd0\x92\xcb\xaeQ\x0ey&\x83\xb9\x9d@'
 b'topsecret'
-
 ```
 
 ### Pipeline data packing
@@ -257,7 +256,7 @@ b'topsecret'
 In this example, the data will be converted in the following order before being stored:
 
 * First, the object to be saved will be pickled
-* After etching, the result will be compressed
+* After pickling, the result will be compressed
 * The compression result is then encrypted
 * The result of encryption is converted to base64
 * The base 64 string is pushed into storage
