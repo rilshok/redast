@@ -124,6 +124,8 @@ class Base64(Packaging):
 
 class Conveyor(Packaging):
     def __init__(self, *packer: Packaging):
+        if not all([isinstance(p, Packaging) for p in packer]):
+            raise ValueError
         self._packers = packer
 
     def forward(self, i):
