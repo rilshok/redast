@@ -8,7 +8,17 @@ short_descriprion = "remote data storage"
 author = "Vladislav A. Proskurov"
 author_email = "rilshok@pm.me"
 url = "https://github.com/rilshok/redast"
-license='MIT'
+license = "MIT"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
 
 version_path = Path(__file__).resolve().parent / name / "__version__.py"
 version = runpy.run_path(version_path)["__version__"]
@@ -32,11 +42,6 @@ setup(
     include_package_data=True,
     version=version,
     install_requires=requirements,
-    classifiers=[
-        "Programming Language :: Python :: 3.9",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Development Status :: 1 - Planning",
-    ],
+    classifiers=classifiers,
     python_requires=">=3.6",
 )
