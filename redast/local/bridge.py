@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Union
 
 from ..core import Storage
-from .local import DriveStorage, MemoryStorage
+from .drive import DriveStorage
+from .memory import MemoryStorage
 
 
 class BridgeStorage(Storage):
