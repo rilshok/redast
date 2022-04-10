@@ -90,6 +90,7 @@ b'hello world'
 ## Check for data in storage
 
 ```python
+key = storage.push(b"hello world")
 ok = storage.exists(key)
 bad = storage.exists("brokenkey")
 print(ok, bad)
@@ -102,6 +103,7 @@ True False
 ## Pop data from storage
 
 ```python
+key = storage.push(b"hello world")
 data = storage.pop(key)
 exist = storage.exists(key)
 print(data, exist)
