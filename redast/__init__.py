@@ -1,2 +1,2 @@
-from .local import LocalStorage
-from .memory import MemoryStorage
+from .bridge import *
+from .local import *

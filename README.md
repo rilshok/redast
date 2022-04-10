@@ -35,15 +35,15 @@ from redast import MemoryStorage
 storage = MemoryStorage()
 ```
 
-### LocalStorage
+### DriveStorage
 
 Local storage of data on drive. To open a storage, you must specify the `root` folder.
 This call will create an empty directory `./myStorage`.
 
 ```python
-from redast import LocalStorage
+from redast import DriveStorage
 
-storage = LocalStorage(root="myStorage", create=True)
+storage = DriveStorage(root="myStorage", create=True)
 ```
 
 ## Data storage interface
@@ -62,7 +62,7 @@ print(key)
 ## Pull data from storage
 
 ```python
-data = storage.pull(key)
+data = storage.load(key)
 print(data)
 ```
 
@@ -100,10 +100,11 @@ The ``link`` method links the saved data to the user identifier.
 
 ```python
 storage.link("hello").push(b"hello world")
-data = storage.link("hello").pull()
+data = storage.link("hello").load()
 print(data)
 ```
-```
+
+```plain
 b'hello world'
 ```
 
@@ -112,7 +113,7 @@ Any python object can act as an identifier, even a lambda function.
 ```python
 key = lambda x: x**2
 storage.link(key).push(b"squaring")
-qrt = storage.link(key).pull()
+qrt = storage.link(key).load()
 print(qrt)
 ```
 
@@ -141,8 +142,8 @@ Some form of pre-processing may be required to store the data. For large storage
 ```python
 data = b"hello"*5
 key = storage.compression.push(data)
-compressed = storage.pull(key)
-data = storage.compression.pull(key)
+compressed = storage.load(key)
+data = storage.compression.load(key)
 print(len(compressed), len(data), compressed, data, sep="\n")
 ```
 
@@ -157,8 +158,8 @@ b'hellohellohellohellohello'
 
 ```python
 key = storage.base64.push(b"hello world")
-data_base64 = storage.pull(key)
-data = storage.base64.pull(key)
+data_base64 = storage.load(key)
+data = storage.base64.load(key)
 print(data_base64, data, sep="\n")
 ```
 
@@ -171,11 +172,10 @@ b'hello world'
 
 Different types of pre-processing can be combined into a single conveyor line
 
-
 ```python
 data = dict(a=1, b=2)
 key = storage.pickling.push(data)
-data = storage.pickling.pull(key)
+data = storage.pickling.load(key)
 print(data)
 ```
 
@@ -188,6 +188,7 @@ print(data)
 Encryption requires an encryption key or user password, from which the encryption key will be generated. When using encryption with a password, you must choose an arbitrary seed to create the salt.
 
 You can generate a random key
+
 ```python
 from redast.core import Encryption
 
@@ -224,8 +225,8 @@ from redast.core import Encryption
 secret = Encryption.generate_key()
 key = storage.encryption(key=secret).push(b"topsecret")
 
-encrypted = storage.pull(key)
-decrypted = storage.encryption(key=secret).pull(key)
+encrypted = storage.load(key)
+decrypted = storage.encryption(key=secret).load(key)
 
 print(encrypted, decrypted, sep="\n")
 ```
@@ -240,8 +241,8 @@ Encryption with a password
 ```python
 key = storage.encryption(password="mypassword", seed=10).push(b"topsecret")
 
-encrypted = storage.pull(key)
-decrypted = storage.encryption(password="mypassword", seed=10).pull(key)
+encrypted = storage.load(key)
+decrypted = storage.encryption(password="mypassword", seed=10).load(key)
 
 print(encrypted, decrypted, sep="\n")
 ```
@@ -261,7 +262,6 @@ In this example, the data will be converted in the following order before being 
 * The result of encryption is converted to base64
 * The base 64 string is pushed into storage
 
-
 ```python
 data = [("hello", "world"), "foo"]
 
@@ -272,8 +272,8 @@ auth = dict(
 pipe = storage.base64.encryption(**auth).compression(level=9).pickling
 
 key = pipe.push(data)
-stored = storage.pull(key)
-data = pipe.pull(key)
+stored = storage.load(key)
+data = pipe.load(key)
 
 print(stored, data, sep="\n")
 ```
@@ -299,8 +299,8 @@ pipe = storage.base64.encryption.compression.pickling
 
 
 key = pipe.push(data)
-stored = storage.pull(key)
-data = pipe.pull(key)
+stored = storage.load(key)
+data = pipe.load(key)
 
 print(stored, data, sep="\n")
 ```
@@ -320,7 +320,7 @@ pipe = storage.base64.compression
 
 data = b"hello world"
 pipe.link("mylink").push(data)
-data = pipe.link("mylink").pull()
+data = pipe.link("mylink").load()
 
 print(data)
 ```

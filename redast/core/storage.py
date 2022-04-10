@@ -66,15 +66,12 @@ class Storage(ABC):
             ),
         )
 
-    def hash(self, data: bytes) -> str:
-        return self._alg(data)
-
     @abstractmethod
-    def save(self, key: str, data: bytes):
+    def exists(self, key: str) -> bool:
         pass
 
     @abstractmethod
-    def exists(self, key: str) -> bool:
+    def save(self, key: str, data: bytes):
         pass
 
     @abstractmethod
@@ -82,22 +79,19 @@ class Storage(ABC):
         pass
 
     @abstractmethod
-    def delete(self, key: str):
+    def delete(self, key: str) -> None:
         pass
 
-    def push(self, data) -> str:
+    def hash(self, data: bytes) -> str:
+        return self._alg(data)
+
+    def push(self, data: bytes) -> str:
         key = self.hash(data)
-        if not self.exists(key):
-            self.save(key, data)
+        self.save(key, data)
         return key
 
-    def pull(self, key: str):
-        if self.exists(key):
-            return self.load(key)
-        raise InvalidHash
-
-    def pop(self, key: str):
-        data = self.pull(key)
+    def pop(self, key: str) -> bytes:
+        data = self.load(key)
         self.delete(key)
         return data
 
@@ -119,12 +113,12 @@ class Pipe(Storage):
         self._wrapper = type(self._wrapper)(**kwargs)
         return self
 
-    def save(self, key, data):
-        wrapped = self._wrapper.forward(data)
-        return self._storage.save(key=key, data=wrapped)
-
     def exists(self, key: str) -> bool:
         return self._storage.exists(key=key)
+
+    def save(self, key: str, data: bytes):
+        wrapped = self._wrapper.forward(data)
+        return self._storage.save(key=key, data=wrapped)
 
     def load(self, key: str):
         wrapped = self._storage.load(key=key)
@@ -133,25 +127,21 @@ class Pipe(Storage):
     def delete(self, key: str):
         return self._storage.delete(key=key)
 
-    def hash(self, data) -> str:
+    def hash(self, data: bytes) -> str:
         wrapped = self._wrapper.forward(data)
         return self._storage.hash(wrapped)
 
-    def push(self, data) -> str:
+    def push(self, data: bytes) -> str:
         wrapped = self._wrapper.forward(data)
         return self._storage.push(wrapped)
 
-    def pull(self, key: str):
-        wrapped = self._storage.pull(key)
-        return self._wrapper.backward(wrapped)
-
-    def pop(self, key: str):
+    def pop(self, key: str) -> bytes:
         wrapped = self._storage.pop(key)
         return self._wrapper.backward(wrapped)
 
 
 class Link:
-    def __init__(self, *markers, storage: Storage) -> None:
+    def __init__(self, *markers, storage: Storage):
         if not isinstance(storage, Storage):
             raise ValueError
         self._marker = storage.hash(cloudpickle.dumps(markers))
@@ -160,16 +150,27 @@ class Link:
     # TODO: garbage collection
 
     def exists(self) -> bool:
-        return self._storage.exists(self._marker)
+        if not self._storage.exists(self._marker):
+            return False
+        data_key = self._storage.load(self._marker).decode()
+        return self._storage.exists(data_key)
 
-    def push(self, data: bytes) -> None:
-        data_key = self._storage.push(data).encode()
-        self._storage.save(self._marker, data_key)
+    def load(self) -> bytes:
+        data_key = self._storage.load(self._marker).decode()
+        return self._storage.load(data_key)
 
-    def pull(self):
-        data_key = self._storage.pull(self._marker).decode()
-        return self._storage.pull(data_key)
+    def delete(self) -> None:
+        data_key = self._storage.pop(self._marker).decode()
+        return self._storage.delete(data_key)
 
-    def pop(self):
+    def hash(self, data: bytes) -> str:
+        return self._storage.hash(data)
+
+    def push(self, data: bytes) -> str:
+        data_key = self._storage.push(data)
+        self._storage.save(self._marker, data_key.encode())
+        return data_key
+
+    def pop(self) -> bytes:
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.pop(data_key)
