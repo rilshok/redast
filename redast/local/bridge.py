@@ -7,7 +7,7 @@ __all__ = (
 from pathlib import Path
 from typing import Union
 
-from .core import Storage
+from ..core import Storage
 from .local import DriveStorage, MemoryStorage
 
 
