@@ -25,7 +25,9 @@ pip install git+https://github.com/rilshok/redast.git
 
 ## Supported storage methods
 
-### MemoryStorage
+### Local storage methods
+
+#### MemoryStorage
 
 Local storage of data in RAM
 
@@ -35,7 +37,7 @@ from redast import MemoryStorage
 storage = MemoryStorage()
 ```
 
-### DriveStorage
+#### DriveStorage
 
 Local storage of data on drive. To open a storage, you must specify the `root` folder.
 This call will create an empty directory `./myStorage`.
@@ -44,6 +46,21 @@ This call will create an empty directory `./myStorage`.
 from redast import DriveStorage
 
 storage = DriveStorage(root="myStorage", create=True)
+```
+
+### Cloud storage methods
+
+#### Mega
+MEGA is a cloud storage and file hosting service offered by MEGA Limited.
+* [mega.io](https://mega.io/) - cloud storage website
+* [Mega.py](https://github.com/odwyersoftware/mega.py) - library for the Mega API
+
+```python
+from redast import MegaCloudStorage
+
+email = input()
+password = input()
+storage = MegaCloudStorage(email=email, password=password, root='mystorage')
 ```
 
 ## Data storage interface

@@ -1,3 +1,4 @@
 pytest
 cloudpickle
 cryptography
+mega.py
