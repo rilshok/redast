@@ -27,25 +27,26 @@ pip install git+https://github.com/rilshok/redast.git
 
 ### Local storage methods
 
-#### MemoryStorage
+#### Memory storage
 
 Local storage of data in RAM
 
 ```python
-from redast import MemoryStorage
+from redast import Storage, Memory
 
-storage = MemoryStorage()
+storage = Storage(Memory())
 ```
 
-#### DriveStorage
+#### Drive storage
 
 Local storage of data on drive. To open a storage, you must specify the `root` folder.
 This call will create an empty directory `./myStorage`.
 
 ```python
-from redast import DriveStorage
+from redast import Storage, Drive
 
-storage = DriveStorage(root="myStorage", create=True)
+drive = Drive(root="myStorage", create=True)
+storage = Storage(drive)
 ```
 
 ### Cloud storage methods
@@ -56,11 +57,12 @@ MEGA is a cloud storage and file hosting service offered by MEGA Limited.
 * [Mega.py](https://github.com/odwyersoftware/mega.py) - library for the Mega API
 
 ```python
-from redast import MegaCloudStorage
+from redast import Storage, MegaCloud
 
 email = input()
 password = input()
-storage = MegaCloudStorage(email=email, password=password, root='mystorage')
+mega = MegaCloud(email=email, password=password, root='mystorage')
+storage = Storage(mega)
 ```
 
 ## Data storage interface
@@ -305,11 +307,12 @@ b'z2bqXGPZoXkN_-3LB9ocrBeWi4rax7le4wJncKe1Cnz7ep-KoHgFDeV2DisMq6Az'
 The default packing options for pipeline data can be set when creating the storage itself
 
 ```python
-from redast import MemoryStorage
+from redast import Storage, Memory
 
 data = [("hello", "world"), "foo"]
 
-storage = MemoryStorage(
+storage = Storage(
+    Memory(),
     compression = 9,
     encryption_password = "mypassword",
     encryption_seed = 2022,
@@ -332,9 +335,9 @@ b'z2bqXGPZoXkN_-3LB9ocrBeWi4rax7le4wJncKe1Cnz7ep-KoHgFDeV2DisMq6Az'
 ### Pipeline data packing with custom links
 
 ```python
-from redast import MemoryStorage
+from redast import Storage, Memory
 
-storage = MemoryStorage()
+storage = Storage(Memory())
 pipe = storage.base64.compression
 
 data = b"hello world"
