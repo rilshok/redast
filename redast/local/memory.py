@@ -1,23 +1,22 @@
-__all__ = (
-    "MemoryStorage",
-)
-
-from ..core import Storage
+__all__ = ("Memory",)
 
 
-class MemoryStorage(Storage):
-    def __init__(self, **kwargs):
+class Memory:
+    def __init__(self):
         self._memory = dict()
-        super().__init__(**kwargs)
 
     def exists(self, key: str) -> bool:
         return key in self._memory
 
+    def save(self, key: str, data: bytes) -> bool:
+        self._memory[key] = data
+        return True
+
     def load(self, key: str) -> bytes:
         return self._memory[key]
 
-    def save(self, key: str, data: bytes):
-        self._memory[key] = data
-
-    def delete(self, key: str):
-        del self._memory[key]
+    def delete(self, key: str) -> bool:
+        if key in self._memory:
+            del self._memory[key]
+            return True
+        return False

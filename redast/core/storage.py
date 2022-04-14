@@ -1,16 +1,25 @@
-__all__ = ("Storage",)
+__all__ = ("Storage", "Keeper", "Bridge")
 
-from abc import ABC, abstractmethod
-from typing import Union
-
+from typing import Union, Protocol, runtime_checkable
 import cloudpickle  # type: ignore
 
 from .hash import blake2b
 from .packaging import *
 
 
-class InvalidHash(ValueError):
-    pass
+@runtime_checkable
+class Keeper(Protocol):
+    def exists(self, key: str) -> bool:
+        pass
+
+    def save(self, key: str, data: bytes) -> bool:
+        pass
+
+    def load(self, key: str) -> bytes:
+        pass
+
+    def delete(self, key: str) -> bool:
+        pass
 
 
 class StorageMethod:
@@ -36,7 +45,7 @@ class StorageMethod:
         self.key = name
 
 
-class Storage(ABC):
+class Storage:
     compression = StorageMethod(Compression)
     pickling = StorageMethod(Pickling)
     encryption = StorageMethod(Encryption)
@@ -44,6 +53,7 @@ class Storage(ABC):
 
     def __init__(
         self,
+        keeper: Keeper,
         *,
         hashing: str = "blake2b",
         compression: int = -1,
@@ -51,6 +61,9 @@ class Storage(ABC):
         encryption_password: Union[str, bytes] = None,
         encryption_seed: int = None,
     ):
+        if not isinstance(keeper, Keeper):
+            raise ValueError
+        self._keeper = keeper
         if hashing == "blake2b":
             self._alg = blake2b
         else:
@@ -66,21 +79,17 @@ class Storage(ABC):
             ),
         )
 
-    @abstractmethod
     def exists(self, key: str) -> bool:
-        pass
+        return self._keeper.exists(key)
 
-    @abstractmethod
     def save(self, key: str, data: bytes):
-        pass
+        return self._keeper.save(key, data)
 
-    @abstractmethod
     def load(self, key: str) -> bytes:
-        pass
+        return self._keeper.load(key)
 
-    @abstractmethod
-    def delete(self, key: str) -> None:
-        pass
+    def delete(self, key: str) -> bool:
+        return self._keeper.delete(key)
 
     def hash(self, data: bytes) -> str:
         return self._alg(data)
@@ -100,7 +109,7 @@ class Storage(ABC):
 
 
 class Pipe(Storage):
-    def __init__(self, storage, wrapper: Packaging):
+    def __init__(self, storage: Storage, wrapper: Packaging):
         if not isinstance(storage, Storage):
             raise ValueError
         if not isinstance(wrapper, Packaging):
@@ -124,7 +133,7 @@ class Pipe(Storage):
         wrapped = self._storage.load(key=key)
         return self._wrapper.backward(wrapped)
 
-    def delete(self, key: str):
+    def delete(self, key: str) -> bool:
         return self._storage.delete(key=key)
 
     def hash(self, data: bytes) -> str:
@@ -159,7 +168,7 @@ class Link:
         data_key = self._storage.load(self._marker).decode()
         return self._storage.load(data_key)
 
-    def delete(self) -> None:
+    def delete(self) -> bool:
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.delete(data_key)
 
@@ -174,3 +183,34 @@ class Link:
     def pop(self) -> bytes:
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.pop(data_key)
+
+
+class Bridge:
+    def __init__(self, src: Keeper, dst: Keeper):
+        assert isinstance(src, Keeper)
+        assert isinstance(dst, Keeper)
+        self._src = src
+        self._dst = dst if isinstance(dst, Storage) else Storage(dst)
+
+    def exists(self, key: str) -> bool:
+        return self._dst.link(key).exists() or self._src.exists(key)
+
+    def save(self, key: str, data: bytes) -> bool:
+        # check for adequacy
+        saved = self._src.save(key, data)
+        if not saved:
+            return False
+        self._dst.link(key).push(data)
+        return True
+
+    def load(self, key: str) -> bytes:
+        try:
+            data = self._dst.link(key).load()
+        except Exception:
+            data = self._src.load(key)
+            self._dst.link(key).push(data)
+        return data
+
+    def delete(self, key: str) -> bool:
+        self._dst.link(key).delete()
+        return self._src.delete(key)
