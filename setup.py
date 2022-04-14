@@ -11,8 +11,6 @@ url = "https://github.com/rilshok/redast"
 license = "MIT"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "License :: OSI Approved :: MIT License",
@@ -43,5 +41,5 @@ setup(
     version=version,
     install_requires=requirements,
     classifiers=classifiers,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
