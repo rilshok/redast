@@ -247,7 +247,7 @@ Encryption requires an encryption key or user password, from which the encryptio
 You can generate a random key
 
 ```python
-from redast.core import Encryption
+from redast import Encryption
 
 secret = Encryption.generate_key()
 print(secret)
@@ -260,7 +260,7 @@ pcu398oGPbEIoc8UgXGnmjJUZOId1bQRWJ5VmpH2gQo=
 Generating an encryption key using a passphrase
 
 ```python
-from redast.core import Encryption
+from redast import Encryption
 
 secret1 = Encryption.generate_key(password="mypassword", seed=2022)
 secret2 = Encryption.generate_key(password="mypassword", seed=2022)
@@ -277,7 +277,7 @@ I4sopjxisx6wb7dCkOtwoBxDvo5lnb6tctcpdpS5jGg=
 Encryption with an encryption key
 
 ```python
-from redast.core import Encryption
+from redast import Encryption
 
 secret = Encryption.generate_key()
 key = storage.encryption(key=secret).push(b"topsecret")
