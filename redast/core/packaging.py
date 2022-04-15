@@ -12,7 +12,7 @@ import os
 import pickle
 import zlib
 from hashlib import sha256
-from typing import Union, Protocol, runtime_checkable
+from typing import Protocol, Union, runtime_checkable
 
 import cloudpickle  # type: ignore
 from cryptography.hazmat.primitives import padding
@@ -21,10 +21,11 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 @runtime_checkable
 class Packaging(Protocol):
-    def forward(self, i: bytes) -> bytes:
+    # TODO: checking for input and output types
+    def forward(self, i):
         pass
 
-    def backward(self, o: bytes) -> bytes:
+    def backward(self, o):
         pass
 
 
@@ -71,6 +72,12 @@ class Base64:
     def backward(self, o: bytes) -> bytes:
         return base64.urlsafe_b64decode(o)
 
+class Json:
+    def forward(self, i) -> bytes:
+        return NotImplemented
+
+    def backward(self, o: bytes):
+        return NotImplemented
 
 class Encryption:
     def __init__(
