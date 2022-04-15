@@ -51,7 +51,7 @@ storage = Storage(drive)
 
 ### Cloud storage methods
 
-#### Mega
+#### Mega cloud storage
 MEGA is a cloud storage and file hosting service offered by MEGA Limited.
 * [mega.io](https://mega.io/) - cloud storage website
 * [Mega.py](https://github.com/odwyersoftware/mega.py) - library for the Mega API
@@ -67,7 +67,7 @@ storage = Storage(mega)
 
 ## Data storage interface
 
-## Push data into storage
+### Push data into storage
 
 ```python
 key = storage.push(b"hello world")
@@ -78,7 +78,7 @@ print(key)
 021ced8799296ceca557832ab941a50b4a11f83478cf141f51f933f653ab9fbcc05a037cddbed06e309bf334942c4e58cdf1a46e237911ccd7fcf9787cbc7fd0
 ```
 
-## Pull data from storage
+### Pull data from storage
 
 ```python
 data = storage.load(key)
@@ -89,7 +89,7 @@ print(data)
 b'hello world'
 ```
 
-## Check for data in storage
+### Check for data in storage
 
 ```python
 key = storage.push(b"hello world")
@@ -102,7 +102,7 @@ print(ok, bad)
 True False
 ```
 
-## Pop data from storage
+### Pop data from storage
 
 ```python
 key = storage.push(b"hello world")
@@ -115,7 +115,7 @@ print(data, exist)
 b'hello world' False
 ```
 
-## Custom links
+### Custom links
 
 The ``link`` method links the saved data to the user identifier.
 
