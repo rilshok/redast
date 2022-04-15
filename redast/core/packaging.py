@@ -38,12 +38,12 @@ class Conveyor:
             raise TypeError
         self._packers = packer
 
-    def forward(self, i: bytes) -> bytes:
+    def forward(self, i) -> Any:
         for p in self._packers:
             i = p.forward(i)
         return i
 
-    def backward(self, o: bytes) -> bytes:
+    def backward(self, o) -> Any:
         for p in reversed(self._packers):
             o = p.backward(o)
         return o
@@ -54,9 +54,11 @@ class Compression:
         self._level = level
 
     def forward(self, i: bytes) -> bytes:
+        assert isinstance(i, bytes)
         return zlib.compress(i, level=self._level)
 
     def backward(self, o: bytes) -> bytes:
+        assert isinstance(o, bytes)
         return zlib.decompress(o)
 
 
@@ -65,21 +67,26 @@ class Pickling:
         return cloudpickle.dumps(i)
 
     def backward(self, o: bytes) -> Any:
+        assert isinstance(o, bytes)
         return pickle.loads(o)
 
 
 class Base64:
     def forward(self, i: bytes) -> bytes:
+        assert isinstance(i, bytes)
         return base64.urlsafe_b64encode(i)
 
     def backward(self, o: bytes) -> bytes:
+        assert isinstance(o, bytes)
         return base64.urlsafe_b64decode(o)
 
 class Json:
+    # TODO: numpy array?
     def forward(self, i) -> str:
         return json.dumps(i)
 
     def backward(self, o: str) -> Any:
+        assert isinstance(o, str)
         return json.loads(o)
 
 class Encoding:
@@ -148,12 +155,14 @@ class Encryption:
         return str(base64.urlsafe_b64encode(password), "utf-8")
 
     def forward(self, i: bytes) -> bytes:
+        assert isinstance(i, bytes)
         padder = Encryption._padding().padder()
         encryptor = Encryption._cipher(self._key).encryptor()
         padded = padder.update(i) + padder.finalize()
         return encryptor.update(padded) + encryptor.finalize()
 
     def backward(self, o: bytes) -> bytes:
+        assert isinstance(o, bytes)
         unpadder = Encryption._padding().unpadder()
         decryptor = Encryption._cipher(self._key).decryptor()
         padded = decryptor.update(o) + decryptor.finalize()
