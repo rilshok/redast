@@ -1,9 +1,10 @@
 __all__ = ("Storage", "Keeper", "Bridge")
 
-from typing import Union, Protocol, runtime_checkable, Type, Any
-import cloudpickle  # type: ignore
+from typing import Any, Protocol, Type, Union, runtime_checkable
 
-from .hash import blake2b
+from cloudpickle import dumps  # type: ignore
+
+from .hash import get_hash_fn
 from .packaging import *
 
 
@@ -67,10 +68,7 @@ class Storage:
         if not isinstance(keeper, Keeper):
             raise ValueError
         self._keeper = keeper
-        if hashing == "blake2b":
-            self._alg = blake2b
-        else:
-            raise ValueError
+        self._alg = get_hash_fn(hashing)
         self._default = dict(
             compression=dict(level=compression),
             encryption=dict(
@@ -96,7 +94,8 @@ class Storage:
         return self._keeper.delete(key)
 
     def hash(self, data) -> str:
-        return self._alg(data)
+        dump = dumps(data)
+        return self._alg(dump)
 
     def push(self, data) -> str:
         key = self.hash(data)
@@ -157,7 +156,7 @@ class Link:
     def __init__(self, *markers, storage: Storage):
         if not isinstance(storage, Storage):
             raise ValueError
-        self._marker = storage.hash(cloudpickle.dumps(markers))
+        self._marker = storage.hash(markers)
         self._storage = storage
 
     # TODO: garbage collection
