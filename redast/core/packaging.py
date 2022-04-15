@@ -11,29 +11,27 @@ import base64
 import os
 import pickle
 import zlib
-from abc import ABC, abstractmethod
 from hashlib import sha256
-from typing import Union
+from typing import Union, Protocol, runtime_checkable
 
 import cloudpickle  # type: ignore
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 
-class Packaging(ABC):
-    @abstractmethod
+@runtime_checkable
+class Packaging(Protocol):
     def forward(self, i: bytes) -> bytes:
         pass
 
-    @abstractmethod
     def backward(self, o: bytes) -> bytes:
         pass
 
 
-class Conveyor(Packaging):
+class Conveyor:
     def __init__(self, *packer: Packaging):
         if not all([isinstance(p, Packaging) for p in packer]):
-            raise ValueError
+            raise TypeError
         self._packers = packer
 
     def forward(self, i: bytes) -> bytes:
@@ -47,7 +45,7 @@ class Conveyor(Packaging):
         return o
 
 
-class Compression(Packaging):
+class Compression:
     def __init__(self, level=-1):
         self._level = level
 
@@ -58,7 +56,7 @@ class Compression(Packaging):
         return zlib.decompress(o)
 
 
-class Pickling(Packaging):
+class Pickling:
     def forward(self, i: bytes) -> bytes:
         return cloudpickle.dumps(i)
 
@@ -66,7 +64,7 @@ class Pickling(Packaging):
         return pickle.loads(o)
 
 
-class Base64(Packaging):
+class Base64:
     def forward(self, i: bytes) -> bytes:
         return base64.urlsafe_b64encode(i)
 
@@ -74,7 +72,7 @@ class Base64(Packaging):
         return base64.urlsafe_b64decode(o)
 
 
-class Encryption(Packaging):
+class Encryption:
     def __init__(
         self,
         *,

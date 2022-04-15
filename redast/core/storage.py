@@ -1,6 +1,6 @@
 __all__ = ("Storage", "Keeper", "Bridge")
 
-from typing import Union, Protocol, runtime_checkable
+from typing import Union, Protocol, runtime_checkable, Type
 import cloudpickle  # type: ignore
 
 from .hash import blake2b
@@ -23,9 +23,9 @@ class Keeper(Protocol):
 
 
 class StorageMethod:
-    def __init__(self, packaging):
+    def __init__(self, packaging: Type[Packaging]):
         if not issubclass(packaging, Packaging):
-            raise ValueError("subclass `Packaging` expected")
+            raise TypeError("subclass `Packaging` expected")
         self._type = packaging
 
     def __get__(self, instance: "Storage", owner):
