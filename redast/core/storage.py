@@ -1,6 +1,6 @@
 __all__ = ("Storage", "Keeper", "Bridge")
 
-from typing import Union, Protocol, runtime_checkable, Type
+from typing import Union, Protocol, runtime_checkable, Type, Any
 import cloudpickle  # type: ignore
 
 from .hash import blake2b
@@ -12,10 +12,10 @@ class Keeper(Protocol):
     def exists(self, key: str) -> bool:
         pass
 
-    def save(self, key: str, data: bytes) -> bool:
+    def save(self, key: str, data) -> bool:
         pass
 
-    def load(self, key: str) -> bytes:
+    def load(self, key: str) -> Any:
         pass
 
     def delete(self, key: str) -> bool:
@@ -82,24 +82,24 @@ class Storage:
     def exists(self, key: str) -> bool:
         return self._keeper.exists(key)
 
-    def save(self, key: str, data: bytes):
+    def save(self, key: str, data) -> bool:
         return self._keeper.save(key, data)
 
-    def load(self, key: str) -> bytes:
+    def load(self, key: str) -> Any:
         return self._keeper.load(key)
 
     def delete(self, key: str) -> bool:
         return self._keeper.delete(key)
 
-    def hash(self, data: bytes) -> str:
+    def hash(self, data) -> str:
         return self._alg(data)
 
-    def push(self, data: bytes) -> str:
+    def push(self, data) -> str:
         key = self.hash(data)
         self.save(key, data)
         return key
 
-    def pop(self, key: str) -> bytes:
+    def pop(self, key: str) -> Any:
         data = self.load(key)
         self.delete(key)
         return data
@@ -125,26 +125,26 @@ class Pipe(Storage):
     def exists(self, key: str) -> bool:
         return self._storage.exists(key=key)
 
-    def save(self, key: str, data: bytes):
+    def save(self, key: str, data) -> bool:
         wrapped = self._wrapper.forward(data)
         return self._storage.save(key=key, data=wrapped)
 
-    def load(self, key: str):
+    def load(self, key: str) -> Any:
         wrapped = self._storage.load(key=key)
         return self._wrapper.backward(wrapped)
 
     def delete(self, key: str) -> bool:
         return self._storage.delete(key=key)
 
-    def hash(self, data: bytes) -> str:
+    def hash(self, data) -> str:
         wrapped = self._wrapper.forward(data)
         return self._storage.hash(wrapped)
 
-    def push(self, data: bytes) -> str:
+    def push(self, data) -> str:
         wrapped = self._wrapper.forward(data)
         return self._storage.push(wrapped)
 
-    def pop(self, key: str) -> bytes:
+    def pop(self, key: str) -> Any:
         wrapped = self._storage.pop(key)
         return self._wrapper.backward(wrapped)
 
@@ -164,7 +164,7 @@ class Link:
         data_key = self._storage.load(self._marker).decode()
         return self._storage.exists(data_key)
 
-    def load(self) -> bytes:
+    def load(self) -> Any:
         data_key = self._storage.load(self._marker).decode()
         return self._storage.load(data_key)
 
@@ -172,15 +172,15 @@ class Link:
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.delete(data_key)
 
-    def hash(self, data: bytes) -> str:
+    def hash(self, data) -> str:
         return self._storage.hash(data)
 
-    def push(self, data: bytes) -> str:
+    def push(self, data) -> str:
         data_key = self._storage.push(data)
         self._storage.save(self._marker, data_key.encode())
         return data_key
 
-    def pop(self) -> bytes:
+    def pop(self) -> Any:
         data_key = self._storage.pop(self._marker).decode()
         return self._storage.pop(data_key)
 
@@ -195,7 +195,7 @@ class Bridge:
     def exists(self, key: str) -> bool:
         return self._dst.link(key).exists() or self._src.exists(key)
 
-    def save(self, key: str, data: bytes) -> bool:
+    def save(self, key: str, data) -> bool:
         # check for adequacy
         saved = self._src.save(key, data)
         if not saved:
@@ -203,7 +203,7 @@ class Bridge:
         self._dst.link(key).push(data)
         return True
 
-    def load(self, key: str) -> bytes:
+    def load(self, key: str) -> Any:
         try:
             data = self._dst.link(key).load()
         except Exception:
