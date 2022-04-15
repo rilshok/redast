@@ -9,16 +9,16 @@ from .packaging import *
 
 @runtime_checkable
 class Keeper(Protocol):
-    def exists(self, key: str) -> bool:
+    def exists(self, key) -> bool:
         pass
 
-    def save(self, key: str, data) -> bool:
+    def save(self, key, data) -> bool:
         pass
 
-    def load(self, key: str) -> Any:
+    def load(self, key) -> Any:
         pass
 
-    def delete(self, key: str) -> bool:
+    def delete(self, key) -> bool:
         pass
 
 
@@ -83,16 +83,16 @@ class Storage:
             encoding=dict(encoding=encoding),
         )
 
-    def exists(self, key: str) -> bool:
+    def exists(self, key) -> bool:
         return self._keeper.exists(key)
 
-    def save(self, key: str, data) -> bool:
+    def save(self, key, data) -> bool:
         return self._keeper.save(key, data)
 
-    def load(self, key: str) -> Any:
+    def load(self, key) -> Any:
         return self._keeper.load(key)
 
-    def delete(self, key: str) -> bool:
+    def delete(self, key) -> bool:
         return self._keeper.delete(key)
 
     def hash(self, data) -> str:
@@ -103,7 +103,7 @@ class Storage:
         self.save(key, data)
         return key
 
-    def pop(self, key: str) -> Any:
+    def pop(self, key) -> Any:
         data = self.load(key)
         self.delete(key)
         return data
@@ -126,29 +126,29 @@ class Pipe(Storage):
         self._wrapper = type(self._wrapper)(**kwargs)
         return self
 
-    def exists(self, key: str) -> bool:
+    def exists(self, key) -> bool:
         return self._storage.exists(key=key)
 
-    def save(self, key: str, data) -> bool:
+    def save(self, key, data) -> bool:
         wrapped = self._wrapper.forward(data)
         return self._storage.save(key=key, data=wrapped)
 
-    def load(self, key: str) -> Any:
+    def load(self, key) -> Any:
         wrapped = self._storage.load(key=key)
         return self._wrapper.backward(wrapped)
 
-    def delete(self, key: str) -> bool:
+    def delete(self, key) -> bool:
         return self._storage.delete(key=key)
 
     def hash(self, data) -> str:
         wrapped = self._wrapper.forward(data)
         return self._storage.hash(wrapped)
 
-    def push(self, data) -> str:
+    def push(self, data) -> Any:
         wrapped = self._wrapper.forward(data)
         return self._storage.push(wrapped)
 
-    def pop(self, key: str) -> Any:
+    def pop(self, key) -> Any:
         wrapped = self._storage.pop(key)
         return self._wrapper.backward(wrapped)
 
@@ -179,7 +179,7 @@ class Link:
     def hash(self, data) -> str:
         return self._storage.hash(data)
 
-    def push(self, data) -> str:
+    def push(self, data) -> Any:
         data_key = self._storage.push(data)
         self._storage.save(self._marker, data_key.encode())
         return data_key
@@ -196,10 +196,10 @@ class Bridge:
         self._src = src
         self._dst = dst if isinstance(dst, Storage) else Storage(dst)
 
-    def exists(self, key: str) -> bool:
+    def exists(self, key) -> bool:
         return self._dst.link(key).exists() or self._src.exists(key)
 
-    def save(self, key: str, data) -> bool:
+    def save(self, key, data) -> bool:
         # check for adequacy
         saved = self._src.save(key, data)
         if not saved:
@@ -207,7 +207,7 @@ class Bridge:
         self._dst.link(key).push(data)
         return True
 
-    def load(self, key: str) -> Any:
+    def load(self, key) -> Any:
         try:
             data = self._dst.link(key).load()
         except Exception:
@@ -215,6 +215,6 @@ class Bridge:
             self._dst.link(key).push(data)
         return data
 
-    def delete(self, key: str) -> bool:
+    def delete(self, key) -> bool:
         self._dst.link(key).delete()
         return self._src.delete(key)
