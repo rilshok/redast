@@ -50,6 +50,8 @@ class Storage:
     pickling = StorageMethod(Pickling)
     encryption = StorageMethod(Encryption)
     base64 = StorageMethod(Base64)
+    json = StorageMethod(Json)
+    encoding = StorageMethod(Encoding)
 
     def __init__(
         self,
@@ -60,6 +62,7 @@ class Storage:
         encryption_key: Union[str, bytes] = None,
         encryption_password: Union[str, bytes] = None,
         encryption_seed: int = None,
+        encoding: str = "utf-8",
     ):
         if not isinstance(keeper, Keeper):
             raise ValueError
@@ -77,6 +80,7 @@ class Storage:
                     seed=encryption_seed,
                 )
             ),
+            encoding=dict(encoding=encoding),
         )
 
     def exists(self, key: str) -> bool:

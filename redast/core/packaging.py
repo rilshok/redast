@@ -4,6 +4,8 @@ __all__ = (
     "Compression",
     "Pickling",
     "Base64",
+    "Json",
+    "Encoding",
     "Encryption",
 )
 
@@ -11,8 +13,9 @@ import base64
 import os
 import pickle
 import zlib
+import json
 from hashlib import sha256
-from typing import Protocol, Union, runtime_checkable
+from typing import Any, Protocol, Union, runtime_checkable
 
 import cloudpickle  # type: ignore
 from cryptography.hazmat.primitives import padding
@@ -22,10 +25,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 @runtime_checkable
 class Packaging(Protocol):
     # TODO: checking for input and output types
-    def forward(self, i):
+    def forward(self, i) -> Any:
         pass
 
-    def backward(self, o):
+    def backward(self, o) -> Any:
         pass
 
 
@@ -58,10 +61,10 @@ class Compression:
 
 
 class Pickling:
-    def forward(self, i: bytes) -> bytes:
+    def forward(self, i) -> bytes:
         return cloudpickle.dumps(i)
 
-    def backward(self, o: bytes) -> bytes:
+    def backward(self, o: bytes) -> Any:
         return pickle.loads(o)
 
 
@@ -73,11 +76,26 @@ class Base64:
         return base64.urlsafe_b64decode(o)
 
 class Json:
-    def forward(self, i) -> bytes:
-        return NotImplemented
+    def forward(self, i) -> str:
+        return json.dumps(i)
 
-    def backward(self, o: bytes):
-        return NotImplemented
+    def backward(self, o: str) -> Any:
+        return json.loads(o)
+
+class Encoding:
+    def __init__(self, encoding="utf-8"):
+        assert isinstance(encoding, str)
+        self._encoding = encoding
+
+    def forward(self, i: str) -> bytes:
+        assert isinstance(i, str)
+        return i.encode(encoding=self._encoding)
+
+    def backward(self, o: bytes) -> str:
+        assert isinstance(o, bytes)
+        return str(o, encoding=self._encoding)
+
+
 
 class Encryption:
     def __init__(
