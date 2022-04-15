@@ -80,6 +80,7 @@ class Base64:
         assert isinstance(o, bytes)
         return base64.urlsafe_b64decode(o)
 
+
 class Json:
     # TODO: numpy array?
     def forward(self, i) -> str:
@@ -88,6 +89,7 @@ class Json:
     def backward(self, o: str) -> Any:
         assert isinstance(o, str)
         return json.loads(o)
+
 
 class Encoding:
     def __init__(self, encoding="utf-8"):
@@ -101,7 +103,6 @@ class Encoding:
     def backward(self, o: bytes) -> str:
         assert isinstance(o, bytes)
         return str(o, encoding=self._encoding)
-
 
 
 class Encryption:
