@@ -189,6 +189,42 @@ b'aGVsbG8gd29ybGQ='
 b'hello world'
 ```
 
+### Json
+
+```python
+value = [1, [2, 3], dict(a=4, b="5")]
+
+key = storage.json.push(value)
+data_json = storage.load(key)
+data = storage.json.load(key)
+
+print(type(data_json).__name__, data_json)
+print(type(data).__name__, data)
+```
+
+```plain
+str [1, [2, 3], {"a": 4, "b": "5"}]
+list [1, [2, 3], {'a': 4, 'b': '5'}]
+```
+
+### Encoding
+
+```python
+value = "Hello, 世界"
+
+key = storage.encoding.push(value)
+data_encoding = storage.load(key)
+data = storage.encoding.load(key)
+
+print(data_encoding)
+print(data)
+```
+
+```plain
+b'Hello, \xe4\xb8\x96\xe7\x95\x8c'
+Hello, 世界
+```
+
 ### Pickling of python objects
 
 Different types of pre-processing can be combined into a single conveyor line
