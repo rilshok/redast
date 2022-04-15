@@ -2,3 +2,4 @@ pytest
 cloudpickle
 cryptography
 mega.py
+xxhash
