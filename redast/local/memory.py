@@ -1,21 +1,23 @@
 __all__ = ("Memory",)
 
+from typing import Any
+
 
 class Memory:
     def __init__(self):
         self._memory = dict()
 
-    def exists(self, key: str) -> bool:
+    def exists(self, key) -> bool:
         return key in self._memory
 
-    def save(self, key: str, data: bytes) -> bool:
+    def save(self, key, data) -> bool:
         self._memory[key] = data
         return True
 
-    def load(self, key: str) -> bytes:
+    def load(self, key) -> Any:
         return self._memory[key]
 
-    def delete(self, key: str) -> bool:
+    def delete(self, key) -> bool:
         if key in self._memory:
             del self._memory[key]
             return True
