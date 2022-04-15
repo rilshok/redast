@@ -94,8 +94,9 @@ class Storage:
         return self._keeper.delete(key)
 
     def hash(self, data) -> str:
-        dump = dumps(data)
-        return self._alg(dump)
+        if not isinstance(data, bytes):
+            data = dumps(data)
+        return self._alg(data)
 
     def push(self, data) -> str:
         key = self.hash(data)
