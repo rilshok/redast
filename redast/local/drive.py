@@ -1,12 +1,13 @@
-__all__ = ("Drive",)
+__all__ = ("Drive", "DriveTemp")
 
 from pathlib import Path
-from typing import Union
+import typing as tp
+import tempfile
 
 
 class Drive:
     # TODO: split hash by dir parts
-    def __init__(self, root: Union[Path, str], create: bool = False):
+    def __init__(self, root: tp.Union[Path, str], create: bool = False):
         root = Path(root)
         if create:
             root.mkdir(mode=0o750, parents=False, exist_ok=True)
@@ -48,3 +49,13 @@ class Drive:
             return True
         except Exception:
             return False
+
+
+class DriveTemp(Drive):
+    def __init__(self):
+        self._temp = tempfile.TemporaryDirectory()
+        super().__init__(root=self._temp.name, create=False)
+
+    def __del__(self):
+        super().__del__()
+        self._temp.cleanup()
