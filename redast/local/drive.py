@@ -59,3 +59,26 @@ class DriveTemp(Drive):
     def __del__(self):
         super().__del__()
         self._temp.cleanup()
+
+    def __getstate__(self):
+        root = self._root
+        storage = dict()
+        for path in root.rglob("*"):
+            key = str(path.relative_to(root))
+            with open(path, "rb") as file:
+                storage[key] = file.read()
+
+        state = self.__dict__.copy()
+        state.pop("_temp")
+        state.pop("_root")
+        state["__storage__"] = storage
+        return state
+
+    def __setstate__(self, state):
+        temp = tempfile.TemporaryDirectory()
+        state["_temp"] = temp
+        state["_root"] = Path(temp.name)
+        storage = state.pop("__storage__")
+        self.__dict__ = state
+        for key in storage:
+            self.save(key, storage[key])
