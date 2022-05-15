@@ -57,7 +57,6 @@ class DriveTemp(Drive):
         super().__init__(root=self._temp.name, create=False)
 
     def __del__(self):
-        super().__del__()
         self._temp.cleanup()
 
     def __getstate__(self):
