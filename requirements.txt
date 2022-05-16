@@ -3,3 +3,4 @@ cloudpickle
 cryptography
 mega.py
 xxhash
+sqlitedict
