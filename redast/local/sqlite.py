@@ -6,7 +6,7 @@ from pathlib import Path
 
 class Sqlite:
     def __init__(self, path, create: bool = False):
-        path = Path(path)
+        path = Path(path).expanduser().absolute()
         if not create and not path.exists():
             raise AssertionError
         self._db = SqliteDict(filename=path, autocommit=True)
