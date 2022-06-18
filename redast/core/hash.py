@@ -1,3 +1,7 @@
+# The MIT License (MIT)
+# Copyright (c) 2022 Vladislav A. Proskurov
+# see LICENSE for full details
+
 import hashlib
 import xxhash
 

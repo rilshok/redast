@@ -1,3 +1,7 @@
+# The MIT License (MIT)
+# Copyright (c) 2022 Vladislav A. Proskurov
+# see LICENSE for full details
+
 __all__ = ("bytes_to_temp_file",)
 
 from typing import Iterator
