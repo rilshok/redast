@@ -54,7 +54,7 @@ class Conveyor:
 
 
 class Compression:
-    def __init__(self, level=-1):
+    def __init__(self, level=3):
         self._level = level
 
     def forward(self, i: bytes) -> bytes:
