@@ -1,4 +1,7 @@
-__all__ = ("Drive", "DriveTemp")
+__all__ = (
+    "Drive",
+    "DriveTemp",
+)
 
 from pathlib import Path
 import typing as tp
@@ -7,12 +10,22 @@ import tempfile
 
 class Drive:
     # TODO: split hash by dir parts
-    def __init__(self, root: tp.Union[Path, str], create: bool = False):
+    def __init__(
+        self,
+        root: tp.Union[Path, str],
+        create: bool = False,
+        unstable: bool = True,
+    ):
         root = Path(root)
         if create:
-            root.mkdir(mode=0o750, parents=False, exist_ok=True)
+            root.mkdir(
+                mode=0o750,
+                parents=False,
+                exist_ok=True,
+            )
         assert root.exists() and root.is_dir()
         self._root = root
+        self._unstable = unstable
 
     @staticmethod
     def _assert_type_key(key):
@@ -24,7 +37,16 @@ class Drive:
 
     def exists(self, key: str) -> bool:
         self._assert_type_key(key)
-        return (self._root / key).exists()
+        path = self._root / key
+        if self._unstable:
+            try:
+                with open(path, "rb"):
+                    return True
+            except FileNotFoundError:
+                return False
+            except Exception:
+                pass
+        return path.exists()
 
     def save(self, key: str, data: bytes) -> bool:
         self._assert_type_key(key)
@@ -54,7 +76,11 @@ class Drive:
 class DriveTemp(Drive):
     def __init__(self):
         self._temp = tempfile.TemporaryDirectory()
-        super().__init__(root=self._temp.name, create=False)
+        super().__init__(
+            root=self._temp.name,
+            create=False,
+            unstable=False,
+        )
 
     def __del__(self):
         self._temp.cleanup()
