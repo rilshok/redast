@@ -23,12 +23,12 @@ class Drive:
         assert isinstance(key, bytes)
 
     def exists(self, key: str) -> bool:
-        Drive._assert_type_key(key)
+        self._assert_type_key(key)
         return (self._root / key).exists()
 
     def save(self, key: str, data: bytes) -> bool:
-        Drive._assert_type_key(key)
-        Drive._assert_type_data(data)
+        self._assert_type_key(key)
+        self._assert_type_data(data)
         try:
             with open(self._root / key, "wb") as file:
                 file.write(data)
@@ -37,13 +37,13 @@ class Drive:
             return False
 
     def load(self, key: str) -> bytes:
-        Drive._assert_type_key(key)
+        self._assert_type_key(key)
         with open(self._root / key, "rb") as file:
             data = file.read()
         return data
 
     def delete(self, key: str) -> bool:
-        Drive._assert_type_key(key)
+        self._assert_type_key(key)
         try:
             Path(self._root / key).unlink()
             return True
