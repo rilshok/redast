@@ -1,3 +1,7 @@
+# The MIT License (MIT)
+# Copyright (c) 2022 Vladislav A. Proskurov
+# see LICENSE for full details
+
 __all__ = ("MegaCloud",)
 
 from ..tool import bytes_to_temp_file

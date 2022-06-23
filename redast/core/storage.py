@@ -1,3 +1,7 @@
+# The MIT License (MIT)
+# Copyright (c) 2022 Vladislav A. Proskurov
+# see LICENSE for full details
+
 __all__ = ("Storage", "Keeper", "Bridge")
 
 from typing import Any, Protocol, Type, Union, runtime_checkable
