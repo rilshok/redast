@@ -161,6 +161,9 @@ class Link:
     def __init__(self, *markers, storage: Storage):
         if not isinstance(storage, Storage):
             raise ValueError
+        assert len(markers) > 0
+        if len(markers) == 1:
+            markers = markers[0]
         self._marker = storage.hash(markers)
         self._storage = storage
 
