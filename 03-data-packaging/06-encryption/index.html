@@ -588,6 +588,8 @@
 <h1 id="encryption">Encryption<a class="headerlink" href="#encryption" title="Permanent link">¤</a></h1>
 <p>Encryption requires an encryption key or user password, from which the encryption key will be generated. When using encryption with a password, you must choose an arbitrary seed to create the salt.</p>
 <p>You can generate a random key</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Encryption</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">secret</span> <span class="o">=</span> <span class="n">Encryption</span><span class="o">.</span><span class="n">generate_key</span><span class="p">()</span>
@@ -595,7 +597,10 @@
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pcu398oGPbEIoc8UgXGnmjJUZOId1bQRWJ5VmpH2gQo=
 </code></pre></div>
+</div>
 <h2 id="generating-an-encryption-key-using-a-passphrase">Generating an encryption key using a passphrase<a class="headerlink" href="#generating-an-encryption-key-using-a-passphrase" title="Permanent link">¤</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Encryption</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">secret1</span> <span class="o">=</span> <span class="n">Encryption</span><span class="o">.</span><span class="n">generate_key</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;mypassword&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2022</span><span class="p">)</span>
@@ -607,7 +612,10 @@
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>DZ6xJLl9D7MkHkYt6JVef1j6o36KU7XzXzYRZrUDt0w=
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>I4sopjxisx6wb7dCkOtwoBxDvo5lnb6tctcpdpS5jGg=
 </code></pre></div>
+</div>
 <h2 id="encryption-with-an-encryption-key">Encryption with an encryption key<a class="headerlink" href="#encryption-with-an-encryption-key" title="Permanent link">¤</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Memory</span><span class="p">,</span> <span class="n">Encryption</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">storage</span> <span class="o">=</span> <span class="n">Storage</span><span class="p">(</span><span class="n">Memory</span><span class="p">())</span>
@@ -624,7 +632,10 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>b&quot;\x00k\xd0=\x81\xedh\x94x\xed\xb0\x14\xe3\r\x96&#39;&quot;
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>b&#39;topsecret&#39;
 </code></pre></div>
+</div>
 <h2 id="encryption-with-a-password">Encryption with a password<a class="headerlink" href="#encryption-with-a-password" title="Permanent link">¤</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Memory</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">storage</span> <span class="o">=</span> <span class="n">Storage</span><span class="p">(</span><span class="n">Memory</span><span class="p">())</span>
@@ -639,6 +650,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>b&#39;\xe4\xc6\x0bc\xd0\x92\xcb\xaeQ\x0ey&amp;\x83\xb9\x9d@&#39;
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>b&#39;topsecret&#39;
 </code></pre></div>
+</div>
 
 
 

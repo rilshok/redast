@@ -566,6 +566,8 @@
 <li>The result of encryption is converted to base64</li>
 <li>The base 64 string is pushed into storage</li>
 </ul>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Memory</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">storage</span> <span class="o">=</span> <span class="n">Storage</span><span class="p">(</span><span class="n">Memory</span><span class="p">())</span>
@@ -587,7 +589,10 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>b&#39;z2bqXGPZoXkN_-3LB9ocrBeWi4rax7le4wJncKe1Cnz7ep-KoHgFDeV2DisMq6Az&#39;
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>[(&#39;hello&#39;, &#39;world&#39;), &#39;foo&#39;]
 </code></pre></div>
+</div>
 <p>The default packing options for pipeline data can be set when creating the storage itself</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Memory</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">),</span> <span class="s2">&quot;foo&quot;</span><span class="p">]</span>
@@ -610,7 +615,10 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>b<span class="s1">&#39;z2bqXGPZoXkN_-3LB9ocrBeWi4rax7le4wJncKe1Cnz7ep-KoHgFDeV2DisMq6Az&#39;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">[(</span><span class="s1">&#39;hello&#39;</span>, <span class="s1">&#39;world&#39;</span><span class="o">)</span>, <span class="s1">&#39;foo&#39;</span><span class="o">]</span>
 </code></pre></div>
+</div>
 <h2 id="pipeline-data-packing-with-custom-links">Pipeline data packing with custom links<a class="headerlink" href="#pipeline-data-packing-with-custom-links" title="Permanent link">¤</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">redast</span> <span class="kn">import</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Memory</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">storage</span> <span class="o">=</span> <span class="n">Storage</span><span class="p">(</span><span class="n">Memory</span><span class="p">())</span>
@@ -624,6 +632,7 @@
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>b&#39;hello world&#39;
 </code></pre></div>
+</div>
 
 
 
