@@ -6,13 +6,26 @@ repo_name: "rilshok/redast"
 watch: [redast]
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
+  - admonition
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+
   - toc:
       permalink: "¤"
+  # - callouts
+  - pymdownx.details
+  # - pymdownx.emoji
+  # - pymdownx.magiclink
+  # - pymdownx.snippets:
+  #     check_paths: true
+
+  # - pymdownx.tasklist
+
 
 plugins:
   - search
