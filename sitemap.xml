@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://rilshok.github.io/redast/00-index/</loc>
-         <lastmod>2022-08-19</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://rilshok.github.io/redast/10-explanation/</loc>
-         <lastmod>2022-08-19</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://rilshok.github.io/redast/20-reference/</loc>
+         <loc>https://rilshok.github.io/redast/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -37,6 +27,41 @@
     </url>
     <url>
          <loc>https://rilshok.github.io/redast/03-data-packaging/00-index/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/01-compression/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/02-base64/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/03-json/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/04-encoding/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/05-pickling/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/06-encryption/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/07-pipeline/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
