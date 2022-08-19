@@ -1,0 +1,55 @@
+site_name: redast - Remote Data Storage
+site_url: https://example.com/
+repo_url: "https://github.com/rilshok/redast"
+
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+plugins:
+- search
+- autorefs
+- coverage
+- section-index
+- mkdocstrings:
+    default_handler: python
+    handlers:
+      # watch:
+      #   - redast
+      python:
+        selection:
+          docstring_style: google
+        rendering:
+          merge_init_into_class:  true
+          show_if_no_docstring: true
+          show_bases: false
+          show_signature_annotations: true
+          show_root_heading: true
+          show_source: false
+
+theme:
+  name: material
+  features:
+  - content.code.annotate
+  # - navigation.tabs
+  # - navigation.top
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+
+nav:
+- Home: index.md
+- reference.md
+- explanation.md
