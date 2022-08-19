@@ -1,6 +1,6 @@
 site_name: redast - Remote Data Storage
-site_url: https://example.com/
-repo_url: "https://github.com/rilshok/redast"
+site_url: https://rilshok.github.io/redast
+repo_url: https://github.com/rilshok/redast
 
 
 markdown_extensions:
