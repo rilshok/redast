@@ -50,6 +50,17 @@ theme:
         name: Switch to dark mode
 
 nav:
-- Home: index.md
-- reference.md
-- explanation.md
+- Home:
+  - 00-index.md
+  - Supported storage methods:
+    - 01-supported-storage-methods/00-index.md
+    - 01-supported-storage-methods/01-local-storage-methods.md
+    - 01-supported-storage-methods/02-cloud-storage-methods.md
+  - Data storage interface:
+    - 02-data-storage-interface/00-index.md
+  - Data packaging:
+    - 03-data-packaging/00-index.md
+- Explanation:
+  - 10-explanation.md
+- Reference:
+  - 20-reference.md
