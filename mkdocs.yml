@@ -1,14 +1,18 @@
-site_name: redast - Remote Data Storage
+site_name: redast
+site_description: Remote Data Storage
 site_url: https://rilshok.github.io/redast
 repo_url: https://github.com/rilshok/redast
-
+repo_name: "rilshok/redast"
+watch: [redast]
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences
+- pymdownx.highlight:
+    anchor_linenums: true
+- pymdownx.inlinehilite
+- pymdownx.snippets
+- pymdownx.superfences
+- toc:
+    permalink: "¤"
 
 plugins:
 - search
@@ -18,8 +22,6 @@ plugins:
 - mkdocstrings:
     default_handler: python
     handlers:
-      # watch:
-      #   - redast
       python:
         selection:
           docstring_style: google
@@ -51,7 +53,7 @@ theme:
 
 nav:
 - Home:
-  - 00-index.md
+  - index.md
   - Supported storage methods:
     - 01-supported-storage-methods/00-index.md
     - 01-supported-storage-methods/01-local-storage-methods.md
@@ -64,3 +66,9 @@ nav:
   - 10-explanation.md
 - Reference:
   - 20-reference.md
+
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/pawamoy
