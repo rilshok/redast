@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://rilshok.github.io/redast/</loc>
+         <loc>https://rilshok.github.io/redast/00-index/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://rilshok.github.io/redast/explanation/</loc>
+         <loc>https://rilshok.github.io/redast/10-explanation/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://rilshok.github.io/redast/index2/</loc>
+         <loc>https://rilshok.github.io/redast/20-reference/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://rilshok.github.io/redast/reference/</loc>
+         <loc>https://rilshok.github.io/redast/01-supported-storage-methods/00-index/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/01-supported-storage-methods/01-local-storage-methods/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/01-supported-storage-methods/02-cloud-storage-methods/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/02-data-storage-interface/00-index/</loc>
+         <lastmod>2022-08-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://rilshok.github.io/redast/03-data-packaging/00-index/</loc>
          <lastmod>2022-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
