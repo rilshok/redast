@@ -1,6 +1,5 @@
 pytest
 cloudpickle
 cryptography
-mega.py==1.0.0
 xxhash
 sqlitedict
